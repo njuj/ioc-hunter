@@ -1,0 +1,14 @@
+{
+  "name": "ioc-hunter",
+  "version": "0.1.0",
+  "description": "Extract, defang and export indicators of compromise from any text. 100% client-side.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
