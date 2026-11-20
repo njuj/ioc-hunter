@@ -35,6 +35,9 @@ test("full sample report", () => {
   assert.deepEqual(values(r.bitcoin), ["bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh"]);
   assert.deepEqual(values(r.paths), ["C:\\Users\\Public\\Libraries\\svchost32.exe"]);
   assert.deepEqual(values(r.registry), ["HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Updater"]);
+  assert.deepEqual(values(r.files), ["Invoice_8841.pdf.exe", "payroll.zip"]);
+  assert.deepEqual(r.ipv6, [{ value: "2001:db8:4f::17", note: "documentation" }]);
+  assert.deepEqual(r.cidr, [{ value: "198.51.100.0/24", note: "documentation" }]);
 });
 
 test("filenames are not domains", () => {
@@ -95,6 +98,9 @@ test("lookups are url-encoded and type-specific", () => {
 });
 
 test("count", () => {
-  // 1 url + 3 domains + 2 ips + 2 emails + 3 hashes + 2 cves + 3 techniques + 1 btc + 1 path + 1 key
-  assert.equal(count(extract(SAMPLE)), 19);
+  // 1 url + 3 domains + 2 ipv4 + 1 ipv6 + 1 range + 2 emails + 3 hashes + 2 files + 2 cves + 3 techniques
+  // + 1 btc + 1 path + 1 key; the cisa.gov reference link and the two 10.x hosts are hidden
+  const r = extract(SAMPLE);
+  assert.equal(count(r), 23);
+  assert.deepEqual(r.hidden, { private: 2, known: 2, allowed: 0 });
 });

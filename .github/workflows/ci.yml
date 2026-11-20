@@ -9,10 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [20, 22]
+        node: [20, 22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
+
+  # the STIX export checked by the OASIS reference validator (schemas + pattern grammar)
+  stix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install stix2-validator
+      - run: node test/stix-bundle.mjs > bundle.json
+      - run: python -c "import json; d = json.load(open('bundle.json')); print(len(d['objects']), 'objects:', sorted({o['type'] for o in d['objects']}))"
+      - run: stix2_validator --strict -v bundle.json

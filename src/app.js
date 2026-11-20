@@ -1,4 +1,4 @@
-import { CATEGORIES, count, defang, extract, lookups, toCSV, toJSON } from "./extract.js";
+import { CATEGORIES, allowEntries, count, defang, extract, lookups, toCSV, toJSON, toSTIX } from "./extract.js";
 import { SAMPLE } from "./sample.js";
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
@@ -10,6 +10,13 @@ const summary = $("#summary");
 const stats = $("#stats");
 const optDefang = $("#opt-defang");
 const optPrivate = $("#opt-private");
+const optKnown = $("#opt-known");
+const allowBox = $("#allow");
+const ALLOW_KEY = "ioc-hunter.allow";
+
+// the allow-list is a convenience, so storage that is blocked or full just means it is not remembered
+try { allowBox.value = localStorage.getItem(ALLOW_KEY) || ""; } catch { /* private window */ }
+if (allowBox.value.trim()) $("#allow-box").open = true;
 let current = extract("");
 
 // Every piece of pasted text reaches the DOM through text nodes — never innerHTML.
@@ -28,7 +35,8 @@ const shown = (key, value) => (optDefang.checked ? defang(value, key) : value);
 
 function render() {
   const started = performance.now();
-  current = extract(input.value, { includePrivate: optPrivate.checked });
+  current = extract(input.value,
+    { includePrivate: optPrivate.checked, includeKnown: !optKnown.checked, allow: allowBox.value });
   const elapsed = performance.now() - started;
   const total = count(current);
 
@@ -55,9 +63,14 @@ function render() {
       list));
   }
 
-  stats.textContent = total
-    ? `${total} indicator${total === 1 ? "" : "s"} · ${elapsed.toFixed(1)} ms · 0 bytes sent`
+  const { known, allowed } = current.hidden;
+  const left = [known && `${known} well-known`, allowed && `${allowed} allow-listed`].filter(Boolean);
+  stats.textContent = total || left.length
+    ? `${total} indicator${total === 1 ? "" : "s"}${left.length ? ` (${left.join(", ")} hidden)` : ""}` +
+      ` · ${elapsed.toFixed(1)} ms · 0 bytes sent`
     : "";
+  const entries = allowEntries(allowBox.value).length;
+  $("#allow-count").textContent = entries ? `(${entries})` : "";
   summary.hidden = total === 0;
   $("#empty").hidden = total > 0;
   $("#exports").hidden = total === 0;
@@ -107,6 +120,11 @@ function debounce(fn, ms) {
 input.addEventListener("input", debounce(render, 120));
 optDefang.addEventListener("change", render);
 optPrivate.addEventListener("change", render);
+optKnown.addEventListener("change", render);
+allowBox.addEventListener("input", debounce(() => {
+  try { localStorage.setItem(ALLOW_KEY, allowBox.value); } catch { /* not remembered */ }
+  render();
+}, 200));
 
 $("#sample").addEventListener("click", () => { input.value = SAMPLE; render(); input.focus(); });
 $("#clear").addEventListener("click", () => { input.value = ""; render(); input.focus(); });
@@ -116,6 +134,8 @@ $("#file").addEventListener("change", (e) => loadFile(e.target.files[0]));
 const stamp = () => new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
 $("#dl-json").addEventListener("click", () =>
   download(`iocs-${stamp()}.json`, "application/json", toJSON(current, { defanged: optDefang.checked })));
+$("#dl-stix").addEventListener("click", () =>
+  download(`iocs-${stamp()}.stix.json`, "application/stix+json", toSTIX(current)));
 $("#dl-csv").addEventListener("click", () =>
   download(`iocs-${stamp()}.csv`, "text/csv", toCSV(current, { defanged: optDefang.checked })));
 $("#copy-all").addEventListener("click", (e) => {
@@ -132,4 +152,5 @@ panel.addEventListener("drop", (e) => {
   loadFile(e.dataTransfer.files[0]);
 });
 
+if (location.hash === "#demo") input.value = SAMPLE;   // shareable demo link (#sample is the button's id)
 render();

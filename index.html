@@ -30,16 +30,23 @@
           <div class="tools">
             <button type="button" id="sample">load sample</button>
             <button type="button" id="open">open file</button>
-            <input type="file" id="file" accept=".txt,.log,.eml,.csv,.json,.md,.html,.xml" hidden>
+            <input type="file" id="file" accept=".txt,.log,.eml,.csv,.json,.md,.adoc,.html,.xml" hidden>
             <button type="button" id="clear">clear</button>
           </div>
         </div>
         <textarea id="input" spellcheck="false" autocomplete="off" aria-label="Text to scan for indicators"
-                  placeholder="Paste a threat report, SIEM export, e-mail headers…&#10;&#10;Defanged indicators are handled: hxxps://evil[.]example[.]com, 203.0.113[.]7, ops[at]example(dot)org&#10;&#10;…or drop a .txt / .log / .eml file here."></textarea>
+                  placeholder="Paste a threat report, SIEM export, e-mail headers…&#10;&#10;Defanged indicators are handled, also inside Markdown and AsciiDoc: hxxps://evil[.]example[.]com, 203.0.113[.]7, ops[at]example(dot)org, evil\[.\]example&#10;&#10;…or drop a .txt / .log / .eml / .md file here."></textarea>
         <div class="opts">
           <label><input type="checkbox" id="opt-defang" checked> defang output</label>
           <label><input type="checkbox" id="opt-private"> include private / reserved IPs</label>
+          <label><input type="checkbox" id="opt-known" checked> hide well-known sites</label>
         </div>
+        <details class="allow" id="allow-box">
+          <summary>allow-list <span id="allow-count"></span></summary>
+          <textarea id="allow" spellcheck="false" autocomplete="off" aria-label="Allow-list: indicators to leave out"
+                    placeholder="your own domains, IPs and IPv4 ranges, one per line&#10;corp.example.com&#10;198.51.100.0/24&#10;# comments are ignored"></textarea>
+          <p class="hint">Saved in this browser only. A domain also covers its subdomains, URLs and e-mail addresses.</p>
+        </details>
       </section>
 
       <section class="panel" aria-labelledby="out-title">
@@ -49,6 +56,7 @@
           <div class="tools" id="exports" hidden>
             <button type="button" id="copy-all" data-label="copy all">copy all</button>
             <button type="button" id="dl-csv">csv</button>
+            <button type="button" id="dl-stix" title="STIX 2.1 bundle for MISP, OpenCTI and TIPs">stix</button>
             <button type="button" id="dl-json" class="primary">json</button>
           </div>
         </div>
