@@ -1,5 +1,5 @@
 // Prints a STIX 2.1 bundle with every kind of object ioc-hunter exports, for the OASIS validator in CI:
-//   node test/stix-bundle.mjs > bundle.json && stix2_validator bundle.json
+//   node scripts/stix-bundle.mjs > bundle.json && stix2_validator bundle.json
 import { extract, toSTIX } from "../src/extract.js";
 import { SAMPLE } from "../src/sample.js";
 

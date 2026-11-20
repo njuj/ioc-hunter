@@ -364,8 +364,8 @@ export function toSTIX(results, { now = new Date(), uuid = () => crypto.randomUU
           external_references: [{ source_name: "cve", external_id: value }] });
       } else if (key === "attack") {
         objects.push({ ...common("attack-pattern"), name: value,
-          external_references: [{ source_name: "mitre-attack", external_id: value,
-            url: `https://attack.mitre.org/techniques/${value.replace(".", "/")}/` }] });
+          // no url: the OASIS validator wants a hash with every reference URL (best practice 302)
+          external_references: [{ source_name: "mitre-attack", external_id: value }] });
       } else {
         const pattern = stixPattern(key, value);
         if (!pattern) continue;

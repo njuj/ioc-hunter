@@ -29,6 +29,6 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install stix2-validator
-      - run: node test/stix-bundle.mjs > bundle.json
+      - run: node scripts/stix-bundle.mjs > bundle.json
       - run: python -c "import json; d = json.load(open('bundle.json')); print(len(d['objects']), 'objects:', sorted({o['type'] for o in d['objects']}))"
       - run: stix2_validator --strict -v bundle.json
