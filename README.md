@@ -1,5 +1,7 @@
 # IOC//HUNTER
 
+[![Part of Cryptid Security](https://img.shields.io/badge/part_of-Cryptid%20Security-00ff9c?style=flat-square&labelColor=0d1117)](https://github.com/cryptid-security)
+
 **Paste a threat report, log or phishing e-mail and get clean, deduplicated, defanged indicators of compromise, ready for your tickets, CSV or a STIX 2.1 bundle.** Everything runs in your browser. The page's own Content-Security-Policy makes it *impossible* for the code to send what you paste anywhere.
 
 On **158 real ESET threat reports** it finds 100% of the hashes, domains, IPs and URLs the vendor published as indicators. v0.1 found 66% of the URLs. On 11 MB of Python source code, where a "domain" is almost always code, it reports 26% fewer than v0.1 (details under [Accuracy](#accuracy-on-real-reports)).
